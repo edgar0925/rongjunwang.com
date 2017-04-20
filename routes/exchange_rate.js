@@ -6,12 +6,12 @@ var iconv = require('iconv-lite');
 
 /* GET exchange rate. */
 router.get('/', function(req, res, next) {
-
-
-
 	loadExchangeRate(res);
+});
 
-  	// res.json('rate exchange!!##!');
+/* GET exchange rate. */
+router.post('/', function(req, res, next) {
+	loadExchangeRate(res);
 });
 
 module.exports = router;

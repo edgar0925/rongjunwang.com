@@ -69,7 +69,7 @@ function showAllResults(res)
 	else
 	{
 		setTimeout(function(){
-			showAllResults();
+			showAllResults(res);
 		}, 1 * 1000);
 	}
 }

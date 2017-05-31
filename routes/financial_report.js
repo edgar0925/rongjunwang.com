@@ -31,12 +31,12 @@ var configures = {
 
 var reports = {};
 
-/* GET exchange rate. */
+/* GET */
 router.get('/', function(req, res, next) {
 	fetchAll(res);
 });
 
-/* POST exchange rate. */
+/* POST */
 router.post('/', function(req, res, next) {
 	fetchAll(res);
 });
@@ -151,6 +151,7 @@ function postRobotMessage(res)
 		body:postData
 	};
 	request(postOptions, function(err, httpResponse, body) {
-		res.json(postData);
+		// res.json(postData);
 	});
+	res.json(postData);
 }

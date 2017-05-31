@@ -6,18 +6,6 @@ var iconv = require('iconv-lite');
 var cheerio = require('cheerio');
 var dateUtils = require('date-utils');
 
-/* GET exchange rate. */
-router.get('/', function(req, res, next) {
-	loadFinancialReport(res);
-});
-
-/* POST exchange rate. */
-router.post('/', function(req, res, next) {
-	loadFinancialReport(res);
-});
-
-module.exports = router;
-
 var configures = { 
 	'阿里巴巴（BABA）' : 'https://cn.investing.com/equities/alibaba-earnings',
 	'腾讯控股（00700）' : 'https://cn.investing.com/equities/tencent-holdings-hk-earnings',
@@ -42,6 +30,18 @@ var configures = {
 	 };
 
 var reports = {};
+
+/* GET exchange rate. */
+router.get('/', function(req, res, next) {
+	loadFinancialReport(res);
+});
+
+/* POST exchange rate. */
+router.post('/', function(req, res, next) {
+	loadFinancialReport(res);
+});
+
+module.exports = router;
 
 function fetchAll()
 {

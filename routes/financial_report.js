@@ -33,17 +33,17 @@ var reports = {};
 
 /* GET exchange rate. */
 router.get('/', function(req, res, next) {
-	fetchAll();
+	fetchAll(res);
 });
 
 /* POST exchange rate. */
 router.post('/', function(req, res, next) {
-	fetchAll();
+	fetchAll(res);
 });
 
 module.exports = router;
 
-function fetchAll()
+function fetchAll(res)
 {
 	console.log('fetching...');
 	for (var name in configures)
@@ -52,10 +52,10 @@ function fetchAll()
 		loadFinancialReport(name, url);
 	}
 
-	showAllResults();
+	showAllResults(res);
 }
 
-function showAllResults()
+function showAllResults(res)
 {
 	var reportSize = Object.getOwnPropertyNames(reports).length;
 	var configureSize = Object.getOwnPropertyNames(configures).length;
@@ -64,7 +64,7 @@ function showAllResults()
 
 	if (reportSize == configureSize)
 	{
-		postRobotMessage();
+		postRobotMessage(res);
 	}
 	else
 	{
@@ -116,7 +116,7 @@ function loadFinancialReport(name, url) {
 	})
 };
 
-function postRobotMessage()
+function postRobotMessage(res)
 {
 	var reportMsg = "> 财报信息：\n\n";
 	for (var name in configures)
@@ -151,8 +151,6 @@ function postRobotMessage()
 		body:postData
 	};
 	request(postOptions, function(err, httpResponse, body) {
-		console.log(body);
+		res.json(postData);
 	});
-
-	// res.json(postData);
 }

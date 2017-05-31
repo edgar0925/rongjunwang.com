@@ -33,12 +33,12 @@ var reports = {};
 
 /* GET exchange rate. */
 router.get('/', function(req, res, next) {
-	loadFinancialReport(res);
+	fetchAll();
 });
 
 /* POST exchange rate. */
 router.post('/', function(req, res, next) {
-	loadFinancialReport(res);
+	fetchAll();
 });
 
 module.exports = router;

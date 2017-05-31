@@ -27,7 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 app.use('/exchange_rate', exchange_rate);
-app.use('/financial_report', exchange_rate);
+app.use('/financial_report', financial_report);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

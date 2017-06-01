@@ -52,7 +52,7 @@ router.post('/', function(req, res, next) {
 
 module.exports = router;
 
-var maxRetryCount = 10;
+var maxRetryCount = 30;
 var count;
 
 function fetchAll(res)
@@ -79,10 +79,7 @@ function showAllResults(res)
 	{
 		var err = '超时' + maxRetryCount + '秒';
 		console.log(err);
-		if (res)
-		{
-			res.send(err);
-		}
+		postRobotMessage(res);
 		return;
 	};
 
@@ -209,7 +206,7 @@ function postRobotMessage(res)
 	{
 		var content = reports[name];
 
-		if (content.length > 0)
+		if (content && content.length > 0)
 		{
 			reportMsg += '> ' + content + '\n\n';
 			console.log(content);

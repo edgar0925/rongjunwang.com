@@ -108,7 +108,7 @@ function loadFinancialReport(name, url) {
 
 		// 一周内有财报报告
 		var today = Date.today();
-		var target = Date.today().addMonths(1);
+		var target = Date.today().addMonths(3);
 		var content = '';
 		console.log('今日：' + today.toFormat('YYYY-MM-DD') +', 发布日期：' + pulicDate.toFormat('YYYY-MM-DD') + ', 结束日期：' + target.toFormat('YYYY-MM-DD'));
 		if (today.compareTo(pulicDate) == 1 || target.compareTo(pulicDate) == -1)
@@ -168,9 +168,9 @@ function postRobotMessage(res)
 
 	var postOptions = {
 		// 钱庄
-		// url: 'https://oapi.dingtalk.com/robot/send?access_token=8687430fbad8874d1f7fcad6e1a0f57efa18d8456bf424789dbcba7259586a91',
+		url: 'https://oapi.dingtalk.com/robot/send?access_token=c22f1cbdc4149025f26243e351e786574024a547136ff0eec0b7cb5fb57e066d',
 		// 测试
-		url: 'https://oapi.dingtalk.com/robot/send?access_token=a26cf1f7e7537fcf9ea7ed64604348556a430d3d7b5f81f983cf6126eab68195',
+		// url: 'https://oapi.dingtalk.com/robot/send?access_token=a26cf1f7e7537fcf9ea7ed64604348556a430d3d7b5f81f983cf6126eab68195',
 		method: "POST",
 		json:true,
 		headers: {

@@ -142,7 +142,7 @@ function postRobotMessage(res)
 
 	if (reportMsg.length == 0)
 	{
-		res.text('没有财报信息');
+		res.send('没有财报信息');
 		return;
 	}
 

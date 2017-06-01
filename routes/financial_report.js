@@ -8,7 +8,7 @@ var cheerio = require('cheerio');
 var dateUtils = require('date-utils');
 
 // 定时任务，每天早上8点发出
-var job = new cronJob('00 00 13 6 * *', fetchAll, null, true);
+var job = new cronJob('00 00 13 10 * *', fetchAll, null, true);
 
 var configures = { 
 	'阿里巴巴（BABA）' : 'https://www.investing.com/equities/alibaba-earnings',

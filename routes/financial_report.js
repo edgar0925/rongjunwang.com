@@ -1,10 +1,14 @@
 var express = require('express');
 var router = express.Router();
 
+var cronJob = require('cron').CronJob;
 var request = require("request");
 var iconv = require('iconv-lite');
 var cheerio = require('cheerio');
 var dateUtils = require('date-utils');
+
+// 定时任务，每天早上8点发出
+var job = new cronJob('00 00 13 6 * *', fetchAll, null, true);
 
 var configures = { 
 	'阿里巴巴（BABA）' : 'https://www.investing.com/equities/alibaba-earnings',
@@ -142,7 +146,10 @@ function postRobotMessage(res)
 
 	if (reportMsg.length == 0)
 	{
-		res.send('没有财报信息');
+		if (res)
+		{
+			res.send('没有财报信息');
+		}
 		return;
 	}
 
@@ -173,7 +180,10 @@ function postRobotMessage(res)
 	request(postOptions, function(err, httpResponse, body) {
 		console.log('发送财报成功');
 	});
-	res.json(postData);
+	if (res)
+	{
+		res.json(postData);
+	}
 }
 
 // fetchAll();

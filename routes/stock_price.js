@@ -52,7 +52,7 @@ router.post('/', function(req, res, next) {
 
 module.exports = router;
 
-var maxRetryCount = 30;
+var maxRetryCount = 20;
 var count;
 
 function fetchAll(res)
@@ -74,15 +74,15 @@ function fetchAll(res)
 
 function showAllResults(res)
 {
-	// count--;
+	count--;
 
-	// if (count < 0) 
-	// {
-	// 	var err = '超时' + maxRetryCount + '秒';
-	// 	console.log(err);
-	// 	postRobotMessage(res);
-	// 	return;
-	// };
+	if (count < 0) 
+	{
+		var err = '超时' + maxRetryCount + '秒';
+		console.log(err);
+		postRobotMessage(res);
+		return;
+	};
 
 	var reportSize = Object.getOwnPropertyNames(reports).length;
 	var configureSize = Object.getOwnPropertyNames(configures).length;
@@ -123,8 +123,8 @@ function loadStockPrice(name, url)
 		url: newUrl,
 		encoding:null,
 		headers: {
-			// "User-Agent": "Mozilla/5.0 (iPad; CPU OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1",
-			"Cookie":"aliyungf_tc=AQAAAFuULzqpVwUAZUp4KoQnu8/vUy/f; s=g312gpw53a; bid=a15ed548e0a303b4178d9b7889139349_j3e8630u; __utmt=1; xq_a_token=781a61987adbf3a6631e26c3c7d4ae5515d5a728; xqat=781a61987adbf3a6631e26c3c7d4ae5515d5a728; xq_r_token=517441b942b7b52d7ddc6534bc93cd8e0504b529; xq_is_login=1; u=7967615343; xq_token_expire=Mon%20Jun%2026%202017%2020%3A05%3A02%20GMT%2B0800%20(CST); Hm_lvt_1db88642e346389874251b5a1eded6e3=1495543502,1496310195; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1496318707; __utma=1.294316794.1495543503.1496310195.1496318549.4; __utmb=1.8.10.1496318549; __utmc=1; __utmz=1.1496310195.3.2.utmcsr=baidu|utmccn=(organic)|utmcmd=organic|utmctr=%E7%BD%91%E6%98%93%E8%82%A1%E7%A5%A8"
+			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+			"Cookie":"aliyungf_tc=AQAAAFuULzqpVwUAZUp4KoQnu8/vUy/f; s=g312gpw53a; bid=a15ed548e0a303b4178d9b7889139349_j3e8630u; xq_a_token=781a61987adbf3a6631e26c3c7d4ae5515d5a728; xqat=781a61987adbf3a6631e26c3c7d4ae5515d5a728; xq_r_token=517441b942b7b52d7ddc6534bc93cd8e0504b529; xq_is_login=1; u=7967615343; xq_token_expire=Mon%20Jun%2026%202017%2020%3A05%3A02%20GMT%2B0800%20(CST); Hm_lvt_1db88642e346389874251b5a1eded6e3=1495543502,1496310195; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1496328583; __utmt=1; __utma=1.294316794.1495543503.1496322733.1496328583.6; __utmb=1.1.10.1496328583; __utmc=1; __utmz=1.1496310195.3.2.utmcsr=baidu|utmccn=(organic)|utmcmd=organic|utmctr=%E7%BD%91%E6%98%93%E8%82%A1%E7%A5%A8"
 		}
 	};
 
@@ -239,9 +239,9 @@ function postRobotMessage(res)
 
 	var postOptions = {
 		// 钱庄
-		url: 'https://oapi.dingtalk.com/robot/send?access_token=c22f1cbdc4149025f26243e351e786574024a547136ff0eec0b7cb5fb57e066d',
+		// url: 'https://oapi.dingtalk.com/robot/send?access_token=c22f1cbdc4149025f26243e351e786574024a547136ff0eec0b7cb5fb57e066d',
 		// 测试
-		// url: 'https://oapi.dingtalk.com/robot/send?access_token=a26cf1f7e7537fcf9ea7ed64604348556a430d3d7b5f81f983cf6126eab68195',
+		url: 'https://oapi.dingtalk.com/robot/send?access_token=a26cf1f7e7537fcf9ea7ed64604348556a430d3d7b5f81f983cf6126eab68195',
 		method: "POST",
 		json:true,
 		headers: {

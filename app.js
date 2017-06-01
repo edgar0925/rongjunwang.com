@@ -9,6 +9,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var exchange_rate = require('./routes/exchange_rate');
 var financial_report = require('./routes/financial_report');
+var stock_price = require('./routes/stock_price');
 
 var app = express();
 
@@ -28,6 +29,7 @@ app.use('/', index);
 app.use('/users', users);
 app.use('/exchange_rate', exchange_rate);
 app.use('/financial_report', financial_report);
+app.use('/stock_price', stock_price);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

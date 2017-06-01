@@ -52,9 +52,15 @@ router.post('/', function(req, res, next) {
 
 module.exports = router;
 
+var maxRetryCount = 10;
+var count;
+
 function fetchAll(res)
 {
 	console.log('fetching...');
+
+	count = maxRetryCount;
+
 	for (var name in configures)
 	{
 		var url = configures[name];
@@ -64,8 +70,6 @@ function fetchAll(res)
 	showAllResults(res);
 }
 
-var maxRetryCount = 10;
-var count  = maxRetryCount;
 
 function showAllResults(res)
 {

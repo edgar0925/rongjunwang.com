@@ -10,6 +10,9 @@ var dateUtils = require('date-utils');
 // 定时任务，每天早上8点发出
 var job = new cronJob('00 00 8 * * *', fetchAll, null, true);
 
+var maxMonths = 3;	// N月内的发布日才会播报
+var dateStep = 7;	// 发布日往前每N天播报一次
+
 var configures = { 
 	'阿里巴巴（BABA）' : 'https://www.investing.com/equities/alibaba-earnings',
 	'腾讯控股（00700）' : 'https://www.investing.com/equities/tencent-holdings-hk-earnings',
@@ -108,7 +111,7 @@ function loadFinancialReport(name, url) {
 
 		// 一周内有财报报告
 		var today = Date.today();
-		var target = Date.today().addMonths(3);
+		var target = Date.today().addMonths(maxMonths);
 		var content = '';
 		console.log('今日：' + today.toFormat('YYYY-MM-DD') +', 发布日期：' + pulicDate.toFormat('YYYY-MM-DD') + ', 结束日期：' + target.toFormat('YYYY-MM-DD'));
 		if (today.compareTo(pulicDate) == 1 || target.compareTo(pulicDate) == -1)
@@ -117,10 +120,10 @@ function loadFinancialReport(name, url) {
 		}
 		else
 		{
-			console.log(name + ':一个月内,' + today.getDaysBetween(pulicDate));
-			if (pulicDate.getDaysBetween(today) % 7 == 0) 
+			console.log(name + ':'+maxMonths+'个月内,' + today.getDaysBetween(pulicDate));
+			if (pulicDate.getDaysBetween(today) % dateStep == 0) 
 			{
-				console.log(name + ':刚好7天倍数');
+				console.log(name + ':刚好'+dateStep+'天倍数');
 				content = name + '将于' + pulicDateStr + '发布截止' + endDateStr + '财报';
 			}
 		}

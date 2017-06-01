@@ -7,26 +7,26 @@ var cheerio = require('cheerio');
 var dateUtils = require('date-utils');
 
 var configures = { 
-	'阿里巴巴（BABA）' : 'https://cn.investing.com/equities/alibaba-earnings',
-	'腾讯控股（00700）' : 'https://cn.investing.com/equities/tencent-holdings-hk-earnings',
-	// '百度（BIDU）' : 'https://cn.investing.com/equities/baidu.com-earnings',
-	// '京东（JD）' : 'https://cn.investing.com/equities/jd.com-inc-adr-earnings',
-	// '苹果（AAPL）' : 'https://cn.investing.com/equities/apple-computer-inc-earnings',
-	// '谷歌A（GOOGL）' : 'https://cn.investing.com/equities/google-inc-earnings',
-	// 'Facebook（FB）' : 'https://cn.investing.com/equities/facebook-inc-earnings',
-	// '亚马逊(AMZN)' : 'https://cn.investing.com/equities/amazon-com-inc-earnings',
-	// '新浪(SINA)' : 'https://cn.investing.com/equities/sina-corp-earnings',
-	// '微博（WB）' : 'https://cn.investing.com/equities/weibo-corp-earnings',
-	// 'Twitter（TWTR）' : 'https://cn.investing.com/equities/twitter-inc-earnings',
-	// '特斯拉（TSLA）' : 'https://cn.investing.com/equities/tesla-motors-earnings',
-	// '陌陌（MOMO）' : 'https://cn.investing.com/equities/momo-inc-earnings',
-	// '网易（NTES）' : 'https://cn.investing.com/equities/netease.com-earnings',
-	// 'PayPal（PYPL）' : 'https://cn.investing.com/equities/paypal-holdings-inc-earnings',
-	// '通用汽车（GM）' : 'https://cn.investing.com/equities/gen-motors-earnings',
-	// '唯品会（VIPS）' : 'https://cn.investing.com/equities/vipshop-holdings-earnings',
-	// '聚美优品（JMEI）' : 'https://cn.investing.com/equities/jumei-international-holding-ltd-earnings',
-	// '微软（MSFT）' : 'https://cn.investing.com/equities/microsoft-corp-earnings',
-	// '英伟达（NVDA）' : 'https://cn.investing.com/equities/nvidia-corp-earnings',
+	'阿里巴巴（BABA）' : 'https://www.investing.com/equities/alibaba-earnings',
+	'腾讯控股（00700）' : 'https://www.investing.com/equities/tencent-holdings-hk-earnings',
+	'百度（BIDU）' : 'https://www.investing.com/equities/baidu.com-earnings',
+	'京东（JD）' : 'https://www.investing.com/equities/jd.com-inc-adr-earnings',
+	'苹果（AAPL）' : 'https://www.investing.com/equities/apple-computer-inc-earnings',
+	'谷歌A（GOOGL）' : 'https://www.investing.com/equities/google-inc-earnings',
+	'Facebook（FB）' : 'https://www.investing.com/equities/facebook-inc-earnings',
+	'亚马逊(AMZN)' : 'https://www.investing.com/equities/amazon-com-inc-earnings',
+	'新浪(SINA)' : 'https://www.investing.com/equities/sina-corp-earnings',
+	'微博（WB）' : 'https://www.investing.com/equities/weibo-corp-earnings',
+	'Twitter（TWTR）' : 'https://www.investing.com/equities/twitter-inc-earnings',
+	'特斯拉（TSLA）' : 'https://www.investing.com/equities/tesla-motors-earnings',
+	'陌陌（MOMO）' : 'https://www.investing.com/equities/momo-inc-earnings',
+	'网易（NTES）' : 'https://www.investing.com/equities/netease.com-earnings',
+	'PayPal（PYPL）' : 'https://www.investing.com/equities/paypal-holdings-inc-earnings',
+	'通用汽车（GM）' : 'https://www.investing.com/equities/gen-motors-earnings',
+	'唯品会（VIPS）' : 'https://www.investing.com/equities/vipshop-holdings-earnings',
+	'聚美优品（JMEI）' : 'https://www.investing.com/equities/jumei-international-holding-ltd-earnings',
+	'微软（MSFT）' : 'https://www.investing.com/equities/microsoft-corp-earnings',
+	'英伟达（NVDA）' : 'https://www.investing.com/equities/nvidia-corp-earnings',
 	 };
 
 var reports = {};
@@ -104,13 +104,23 @@ function loadFinancialReport(name, url) {
 
 		// 一周内有财报报告
 		var today = Date.today();
-		var target = today.addWeeks(1);
+		var target = Date.today().addMonths(1);
+		var content = '';
+		console.log('今日：' + today.toFormat('YYYY-MM-DD') +', 发布日期：' + pulicDate.toFormat('YYYY-MM-DD') + ', 结束日期：' + target.toFormat('YYYY-MM-DD'));
 		if (today.compareTo(pulicDate) == 1 || target.compareTo(pulicDate) == -1)
 		{
-			// return;
-		};
+			content = '';
+		}
+		else
+		{
+			console.log(name + ':一个月内,' + today.getDaysBetween(pulicDate));
+			if (pulicDate.getDaysBetween(today) % 7 == 0) 
+			{
+				console.log(name + ':刚好7天倍数');
+				content = name + '将于' + pulicDateStr + '发布截止' + endDateStr + '财报';
+			}
+		}
 
-		var content = '' + name + '将于' + pulicDateStr + '发布截止' + endDateStr + '财报';
 		reports[name] = content;
 		console.log(reports[name]);
 	})
@@ -118,15 +128,25 @@ function loadFinancialReport(name, url) {
 
 function postRobotMessage(res)
 {
-	var reportMsg = "> 财报信息：\n\n";
+	var reportMsg = '';
 	for (var name in configures)
 	{
 		var content = reports[name];
-		reportMsg += '> ' + content + '\n\n';
-		console.log(content);	
+
+		if (content.length > 0)
+		{
+			reportMsg += '> ' + content + '\n\n';
+			console.log(content);
+		}	
 	}
 
-	var postText = reportMsg;
+	if (reportMsg.length == 0)
+	{
+		res.text('没有财报信息');
+		return;
+	}
+
+	var postText = '> 财报信息：\n\n' + reportMsg;
 
 	console.log(reportMsg);
 
@@ -151,7 +171,9 @@ function postRobotMessage(res)
 		body:postData
 	};
 	request(postOptions, function(err, httpResponse, body) {
-		// res.json(postData);
+		console.log('发送财报成功');
 	});
 	res.json(postData);
 }
+
+// fetchAll();

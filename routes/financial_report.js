@@ -62,8 +62,24 @@ function fetchAll(res)
 	showAllResults(res);
 }
 
+var maxRetryCount = 30;
+var count  = maxRetryCount;
+
 function showAllResults(res)
 {
+	count--;
+
+	if (count < 0) 
+	{
+		var err = '超时' + maxRetryCount + '秒';
+		console.log(err);
+		if (res)
+		{
+			res.send(err);
+		}
+		return;
+	};
+
 	var reportSize = Object.getOwnPropertyNames(reports).length;
 	var configureSize = Object.getOwnPropertyNames(configures).length;
 

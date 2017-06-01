@@ -10,7 +10,7 @@ var dateUtils = require('date-utils');
 // 定时任务，每天早上8点发出
 var job = new cronJob('00 00 8 * * *', fetchAll, null, true);
 
-var scope = 0;	// 涨跌幅范围内才播报一次
+var scope = 1;	// 涨跌幅范围内才播报一次
 var nameColor = '#0099ff';	// 名称颜色
 var upColor = '#f24957';	// 涨颜色
 var downColor = '#1dbf60';	// 跌颜色

@@ -67,7 +67,9 @@ function fetchAll(res)
 		loadStockPrice(name, url);
 	}
 
-	showAllResults(res);
+	setTimeout(function(){
+		showAllResults(res);
+	}, 1000);
 }
 
 function showAllResults(res)

@@ -70,18 +70,17 @@ function fetchAll(res)
 	showAllResults(res);
 }
 
-
 function showAllResults(res)
 {
-	count--;
+	// count--;
 
-	if (count < 0) 
-	{
-		var err = '超时' + maxRetryCount + '秒';
-		console.log(err);
-		postRobotMessage(res);
-		return;
-	};
+	// if (count < 0) 
+	// {
+	// 	var err = '超时' + maxRetryCount + '秒';
+	// 	console.log(err);
+	// 	postRobotMessage(res);
+	// 	return;
+	// };
 
 	var reportSize = Object.getOwnPropertyNames(reports).length;
 	var configureSize = Object.getOwnPropertyNames(configures).length;

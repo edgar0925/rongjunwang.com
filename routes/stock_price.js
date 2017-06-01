@@ -182,7 +182,7 @@ function loadStockPrice(name, url)
 			}
 		}
 
-		reports[name] = content;
+		reports[name] = content?:'';
 		console.log(reports[name]);
 	})
 };

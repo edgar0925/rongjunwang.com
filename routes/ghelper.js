@@ -39,5 +39,5 @@ function dealToWhatGroupDo()
 		"msgtype": "markdown"
 	};
 
-	res.json(postData);
+	response.json(postData);
 }

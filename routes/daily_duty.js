@@ -212,11 +212,12 @@ function saveSequenceOfToday(seq)
 }
 
 /* 发送机器人 */
-var url = 'https://oapi.dingtalk.com/robot/send?access_token=1ed9af8c0be743a2933c57e0392bcc31484d24cdb26b289b400399b9c4cc6ce8';
+var url = 'https://oapi.dingtalk.com/robot/send?access_token=3a5d135853de6e2ac46d92fc3fd244c964f0bb303e4559eec93a1e09cb18d4ff';
 function sendRobotMsg(url, msg, func)
 {
+	var testUrl = CRequest.query.test_url;
 	var postOptions = {
-		url: url,
+		url: testUrl?testUrl:url,
 		method: "POST",
 		json:true,
 		headers: {

@@ -11,6 +11,7 @@ var exchange_rate = require('./routes/exchange_rate');
 var financial_report = require('./routes/financial_report');
 var stock_price = require('./routes/stock_price');
 var ghelper = require('./routes/ghelper');
+var new_function = require('./routes/new_function');
 
 var app = express();
 
@@ -32,6 +33,7 @@ app.use('/exchange_rate', exchange_rate);
 app.use('/financial_report', financial_report);
 app.use('/stock_price', stock_price);
 app.use('/ghelper', ghelper);
+app.use('/new_function', new_function);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

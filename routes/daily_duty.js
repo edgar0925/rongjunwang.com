@@ -65,6 +65,15 @@ function dosomething()
 {
 	console.log('dosomething...');
 
+	var idx = CRequest.query.idx;
+	if (idx)
+	{
+		saveSequenceOfToday(idx);
+		CResponse.send('重置位置：'+names[idx]);
+		return ;
+	}
+
+
 	if (!isDateValid) 
 	{
 		CResponse.send('周末不发送');

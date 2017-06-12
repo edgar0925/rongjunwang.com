@@ -65,18 +65,23 @@ function dosomething()
 {
 	console.log('dosomething...');
 
-	var idx = CRequest.query.idx;
-	if (idx)
+	if (CRequest)
 	{
-		saveSequenceOfToday(idx);
-		CResponse.send('重置位置：'+names[idx]);
-		return ;
+		var idx = CRequest.query.idx;
+		if (idx)
+		{
+			saveSequenceOfToday(idx);
+			CResponse.send('重置位置：'+names[idx]);
+			return ;
+		}
 	}
-
 
 	if (!isDateValid) 
 	{
-		CResponse.send('周末不发送');
+		if (CResponse)
+		{
+			CResponse.send('周末不发送');
+		};
 		return;
 	};
 
@@ -116,7 +121,10 @@ function dosomething()
 		};
 
 		sendRobotMsg(url, msg, function(){
-			CResponse.send('发送成功');
+			if (CResponse)
+			{
+				CResponse.send('发送成功');
+			};
 		});
 
 		// 记录
@@ -215,7 +223,7 @@ function saveSequenceOfToday(seq)
 var url = 'https://oapi.dingtalk.com/robot/send?access_token=3a5d135853de6e2ac46d92fc3fd244c964f0bb303e4559eec93a1e09cb18d4ff';
 function sendRobotMsg(url, msg, func)
 {
-	var testUrl = CRequest.query.test_url;
+	var testUrl = CRequest ? CRequest.query.test_url : null;
 	var postOptions = {
 		url: testUrl?testUrl:url,
 		method: "POST",

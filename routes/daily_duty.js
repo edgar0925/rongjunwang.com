@@ -76,7 +76,7 @@ function dosomething()
 		}
 	}
 
-	if (!isDateValid) 
+	if (!isDateValid()) 
 	{
 		if (CResponse)
 		{

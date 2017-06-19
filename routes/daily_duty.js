@@ -99,7 +99,7 @@ function dosomething()
 		{
 			var name = names[seq];
 			var nextName = names[nextSeq];
-			postText = '· 今天是'+today()+'，【'+ name + '】值日! 明日：'+nextName+'\n'+
+			postText = '· '+today()+'，今天值日：【'+ name + '】! 明日：'+nextName+'\n'+
 			'· 请填写[阿里巴巴钉钉-日志-团队每日精进]\n'+
 			'· 负责收集基础各小组的问题、机会点、Badcase、发布内容、团队人员情况等。';
 		}

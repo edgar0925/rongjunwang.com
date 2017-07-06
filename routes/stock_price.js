@@ -8,226 +8,279 @@ var cheerio = require('cheerio');
 var dateUtils = require('date-utils');
 
 // 定时任务，每天早上8点发出
-var job = new cronJob('00 00 8 * * *', fetchAll, null, true);
+var job_us = new cronJob('00 00 8 * * *', loadStockPrice_us, null, true);
+var job_hk = new cronJob('00 01 16 * * *', loadStockPrice_hk, null, true);
 
-var scope = 1;	// 涨跌幅范围内才播报一次
-var nameColor = '#0099ff';	// 名称颜色
-var upColor = '#f24957';	// 涨颜色
-var downColor = '#1dbf60';	// 跌颜色
+var CRequest;
+var CResponse;
+var ratioLimit_us = 1;	// 涨跌幅范围内才播报一次
+var ratioLimit_hk = 0;
 
-var configures = { 
-	'阿里巴巴（BABA）' : 'usBABA',
-	'腾讯控股（00700）' : 'hk00700',
-	'百度（BIDU）' : 'usBIDU',
-	'京东（JD）' : 'usJD',
-	'苹果（AAPL）' : 'usAAPL',
-	'谷歌A（GOOGL）' : 'usGOOGL',
-	'Facebook（FB）' : 'usFB',
-	'亚马逊(AMZN)' : 'usAMZN',
-	'新浪(SINA)' : 'usSINA',
-	'微博（WB）' : 'usWB',
-	'Twitter（TWTR）' : 'usTWTR',
-	'特斯拉（TSLA）' : 'usTSLA',
-	'陌陌（MOMO）' : 'usMOMO',
-	'网易（NTES）' : 'usNTES',
-	'PayPal（PYPL）' : 'usPYPL',
-	'通用汽车（GM）' : 'usGM',
-	'唯品会（VIPS）' : 'usVIPS',
-	'聚美优品（JMEI）' : 'usJMEI',
-	'微软（MSFT）' : 'usMSFT',
-	'英伟达（NVDA）' : 'usNVDA',
-	 };
+var content_us = null;
+var content_hk = null;
 
-var reports = {};
+var configures_us = [
+	'BABA', // 阿里巴巴（BABA）
+	'BIDU', // 百度（BIDU）
+	'JD', 	// 京东（JD）
+	'AAPL',	// 苹果（AAPL）
+	'GOOGL',// 谷歌A（GOOGL）
+	'FB',	// Facebook（FB）
+	'AMZN',	// 亚马逊(AMZN)
+	'SINA',	// 新浪(SINA)
+	'WB',	// 微博（WB）
+	'TWTR',	// Twitter（TWTR）
+	'TSLA',	// 特斯拉（TSLA）
+	'MOMO',	// 陌陌（MOMO）
+	'NTES',	// 网易（NTES）
+	'PYPL', // PayPal（PYPL）
+	'GM',	// 通用汽车（GM）
+	'VIPS',	// 唯品会（VIPS）
+	'JMEI', // 聚美优品（JMEI）
+	'MSFT', // 微软（MSFT）
+	'NVDA', // 英伟达（NVDA）
+	 ];
+
+var configures_hk = [
+	'00700', // 腾讯控股（00700）
+	 ];
 
 /* GET */
-router.get('/', function(req, res, next) {
-	fetchAll(res);
+router.get('/', function(req, res, next) 
+{
+	CRequest = req;
+	CResponse = res;
+
+	fetchAll();
 });
 
 /* POST */
-router.post('/', function(req, res, next) {
-	fetchAll(res);
+router.post('/', function(req, res, next) 
+{
+	CRequest = req;
+	CResponse = res;
+
+	fetchAll();
 });
 
 module.exports = router;
 
-var maxRetryCount = 20;
-var count;
+var maxRetryCount = 1;
 
-function fetchAll(res)
+function fetchAll()
 {
-	console.log('fetching...');
-
-	count = maxRetryCount;
-
-	for (var name in configures)
+	if (CRequest.query.t == 'hk')
 	{
-		var url = configures[name];
-		loadStockPrice(name, url);
+		loadStockPrice_hk();
 	}
-
-	setTimeout(function(){
-		showAllResults(res);
-	}, 1000);
+	else
+	{	
+		loadStockPrice_us();
+	}
 }
 
-function showAllResults(res)
+function unit(key)
 {
-	count--;
-
-	if (count < 0) 
+	if (key.startsWith('us'))
 	{
-		var err = '超时' + maxRetryCount + '秒';
-		console.log(err);
-		postRobotMessage(res);
-		return;
-	};
-
-	var reportSize = Object.getOwnPropertyNames(reports).length;
-	var configureSize = Object.getOwnPropertyNames(configures).length;
-
-	console.log(reportSize + ":" + configureSize);
-
-	if (reportSize == configureSize)
+		return '美元';
+	}
+	else if (key.startsWith('hk'))
 	{
-		postRobotMessage(res);
+		return '港元';
 	}
 	else
 	{
-		setTimeout(function(){
-			showAllResults(res);
-		}, 1 * 1000);
+		return '元';
 	}
 }
 
-function loadStockPrice(name, url) 
+function isAlibaba(key)
 {
-	var unit = '元';
-	if (url.startsWith('us'))
-	{
-		unit = '美元';
-		url = url.substr(2, url.length - 2);
-	}
-	else if (url.startsWith('hk'))
-	{
-		unit = '港元';
-		url = url.substr(2, url.length - 2);
-	}
-	var isAlibaba = name == '阿里巴巴（BABA）';
+	return key == 'BABA';
+}
 
-	var newUrl = 'https://xueqiu.com/S/'+url;
-	// console.log(name+':'+newUrl);
+function keys_us()
+{
+	var keys = '';
+	for (var index in configures_us)
+	{
+		keys += 's_us' + configures_us[index] + ',';
+	}
+	return keys;
+}
+
+function keys_hk()
+{
+	var keys = '';
+	for (var index in configures_hk)
+	{
+		keys += 's_hk' + configures_hk[index] + ',';
+	}
+	return keys;
+}
+
+// key，名称，收盘价，涨跌幅，市值
+function getStocks(body, local)
+{
+	var stocks = [];
+
+	// v_s_usBABA="200~阿里巴巴~BABA.N~144.87~3.88~2.75~16969046~0~3664.29~";
+	var lines = body.split('";');
+
+	// console.log(body);
+
+	for (var index in lines)
+	{
+		var line = lines[index];
+		var arr = line.split('="');
+
+		// console.log('*' + arr[1] + '*');
+
+		if (!arr[1])
+		{
+			continue;
+		};
+
+		var values = arr[1].split('~');
+		
+		// key
+		var key = values[2].split('.')[0];
+
+		var stock = {
+			'key' : key,
+			'name' : values[1],
+			'close' : parseFloat(values[3]),
+			'ratio' : parseFloat(values[5]),
+			'capital' : parseFloat(values[8]?values[8]:values[9]),
+		};
+
+		console.log(stock);
+
+		if (isAlibaba(key))
+		{
+			stocks.unshift(stock);
+		}
+		else
+		{
+			stocks.push(stock);
+		}
+	}
+	return stocks;
+}
+
+function loadStockPrice_us() 
+{
+	var random = Math.random();
+	var url = 'http://qt.gtimg.cn/?_='+random+'&q='+keys_us();
+	console.log(url);
 
 	var options = {
-		url: newUrl,
+		url: url,
 		encoding:null,
-		headers: {
-			"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
-			"Cookie":"aliyungf_tc=AQAAAFuULzqpVwUAZUp4KoQnu8/vUy/f; s=g312gpw53a; bid=a15ed548e0a303b4178d9b7889139349_j3e8630u; xq_a_token=781a61987adbf3a6631e26c3c7d4ae5515d5a728; xqat=781a61987adbf3a6631e26c3c7d4ae5515d5a728; xq_r_token=517441b942b7b52d7ddc6534bc93cd8e0504b529; xq_is_login=1; u=7967615343; xq_token_expire=Mon%20Jun%2026%202017%2020%3A05%3A02%20GMT%2B0800%20(CST); Hm_lvt_1db88642e346389874251b5a1eded6e3=1495543502,1496310195; Hm_lpvt_1db88642e346389874251b5a1eded6e3=1496328583; __utmt=1; __utma=1.294316794.1495543503.1496322733.1496328583.6; __utmb=1.1.10.1496328583; __utmc=1; __utmz=1.1496310195.3.2.utmcsr=baidu|utmccn=(organic)|utmcmd=organic|utmctr=%E7%BD%91%E6%98%93%E8%82%A1%E7%A5%A8"
-		}
+		headers: {}
 	};
 
 	request(options, function(error, response, body) {
 
-		console.log('request success!!!'+url);
+		console.log('us request success!!!');
 		// decode 
-		body = iconv.decode(body,'utf-8');
-		var arr = body.match(/quote = \{(.*)\}/g);
+		body = iconv.decode(body,'gbk');
 
-		if (arr.length > 0)
-		{
-			body = arr[0].replace('quote = ', '');
-		}
-		else
-		{
-			body = null;
-		}
+		// key，名称，收盘价，涨跌幅，市值
+		var stocks = getStocks(body);
 
 		var content = '';
-		if (body)
+		for (var index in stocks)
 		{
-			var base = JSON.parse(body);
-			var close = base.current;	// 收盘价
-			var netChangeRatio = base.percentage;	// 涨跌幅
-			var capitalization = base.marketCapital.substr(0, base.marketCapital.length - 1);	// 市值
-			// console.log('收盘价:'+close+',涨幅：'+netChangeRatio+'，市值:'+capitalization+unit);
-			// return;
-			
-			if (Math.abs(netChangeRatio) > scope || isAlibaba) 
-			{
-				var color = '';
-				var ratioText = '';
-				// 涨
-				if (netChangeRatio >= 0)
-				{
-					color = upColor;
-					ratioText = '涨跌幅';
-				}
-				else // 跌
-				{
-					color = downColor;
-					ratioText = '涨跌幅';
-				}
+			var stock = stocks[index];
 
-				content = ' **'+textWithFont(name) +'** '
-				+ '最新价' + textWithFont(close) + unit 
-				+ '\n' + ratioText + textWithFont(netChangeRatio) 
-				+ '%，市值' + textWithFont(capitalization) + '亿' + unit;
-			}
-			else
+			if (Math.abs(stock.ratio) >= ratioLimit_us || isAlibaba(stock.key)) 
 			{
-				content = '';
+				var unit = '美元';
+				var updown = stock.ratio >= 0 ? '涨↑' : '跌↓';
+				content += '**'+ stock.name +'** \n\n'
+				+ '> 最新价' + stock.close + unit 
+				+ '，' + updown + stock.ratio 
+				+ '%，市值' + stock.capital + '亿' + unit + '\n\n';
 			}
 		}
 
-		reports[name] = content ? content : '';
-		console.log(reports[name]);
-	})
+		content_us = content;
+		mergeResults();
+	});
 };
 
-function textWithFont(text, color, size, font)
+function loadStockPrice_hk() 
 {
-	if (color || size || font)
+	var random = Math.random();
+	var url = 'http://qt.gtimg.cn/?_='+random+'&q='+keys_hk();
+	console.log(url);
+
+	var options = {
+		url: url,
+		encoding:null,
+		headers: {}
+	};
+
+	request(options, function(error, response, body) {
+
+		console.log('us request success!!!');
+		// decode 
+		body = iconv.decode(body,'gbk');
+
+		// key，名称，收盘价，涨跌幅，市值
+		var stocks = getStocks(body);
+
+		var content = '';
+		for (var index in stocks)
+		{
+			var stock = stocks[index];
+
+			if (Math.abs(stock.ratio) >= ratioLimit_hk || isAlibaba(stock.key)) 
+			{
+				var unit = '港元';
+				var updown = stock.ratio >= 0 ? '涨↑' : '跌↓';
+				content += '**'+ stock.name +'** \n\n'
+				+ '> 最新价' + stock.close + unit 
+				+ '，' + updown + stock.ratio 
+				+ '%，市值' + stock.capital + '亿' + unit + '\n\n';
+			}
+		}
+
+		content_hk = content;
+		mergeResults();
+	});
+};
+
+function mergeResults()
+{
+	// if (content_us != null && content_hk != null)
+	// {
+	// 	postRobotMessage(content_us + content_hk);
+	// };
+
+	if (content_us != null)
 	{
-		var fontPart = font ? ' face="'+font+'"' : '';
-		var sizePart = size ? ' size='+size : '';
-		var colorPart = color ? ' color='+color : '';
-		return '<font '+fontPart + sizePart + colorPart +' >'+text+'</font>';
+		postRobotMessage(content_us);
 	}
-	else
+	else if (content_hk != null)
 	{
-		return text;
-	}
+		postRobotMessage(content_hk);
+	};
 }
 
-function postRobotMessage(res)
+function postRobotMessage(content)
 {
-	var reportMsg = '';
-	for (var name in configures)
+	if (content.length == 0)
 	{
-		var content = reports[name];
-
-		if (content && content.length > 0)
-		{
-			reportMsg += '> ' + content + '\n\n';
-			console.log(content);
-		}	
-	}
-
-	if (reportMsg.length == 0)
-	{
-		console.log('没有股价信息');
-		if (res)
-		{
-			res.send('没有股价信息');
-		}
+		CResponse.send('没有股价信息');
 		return;
 	}
 
-	var postText = '> 股价信息：\n\n' + reportMsg;
+	var postText = '**股价信息：**\n\n' + content;
 
-	console.log(reportMsg);
+	console.log(postText);
 
 	var postData = {
 		"markdown": {
@@ -239,9 +292,9 @@ function postRobotMessage(res)
 
 	var postOptions = {
 		// 钱庄
-		url: 'https://oapi.dingtalk.com/robot/send?access_token=c22f1cbdc4149025f26243e351e786574024a547136ff0eec0b7cb5fb57e066d',
+		// url: 'https://oapi.dingtalk.com/robot/send?access_token=c22f1cbdc4149025f26243e351e786574024a547136ff0eec0b7cb5fb57e066d',
 		// 测试
-		// url: 'https://oapi.dingtalk.com/robot/send?access_token=a26cf1f7e7537fcf9ea7ed64604348556a430d3d7b5f81f983cf6126eab68195',
+		url: 'https://oapi.dingtalk.com/robot/send?access_token=1ed9af8c0be743a2933c57e0392bcc31484d24cdb26b289b400399b9c4cc6ce8',
 		method: "POST",
 		json:true,
 		headers: {
@@ -252,10 +305,5 @@ function postRobotMessage(res)
 	request(postOptions, function(err, httpResponse, body) {
 		console.log('发送股价成功');
 	});
-	if (res)
-	{
-		res.json(postData);
-	}
+	CResponse.json(postData);
 }
-
-// fetchAll();

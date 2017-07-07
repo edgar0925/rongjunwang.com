@@ -2,54 +2,66 @@ var express = require('express');
 var router = express.Router();
 
 var cronJob = require('cron').CronJob;
-var request = require("request");
+var httpRequest = require("request");
 var iconv = require('iconv-lite');
 var cheerio = require('cheerio');
 var dateUtils = require('date-utils');
+var mock = require('./http_mock');
 
 // 定时任务，每天早上8点发出
-var job_us = new cronJob('00 00 8 * * *', loadStockPrice_us, null, true);
-var job_hk = new cronJob('00 01 16 * * *', loadStockPrice_hk, null, true);
+var job_us = new cronJob('05 00 8 * * *', loadStockPrice_us, null, true);
+var job_hk = new cronJob('05 00 16 * * *', loadStockPrice_hk, null, true);
 
-var CRequest;
-var CResponse;
+var request;
+var response = mock.response;
 var ratioLimit_us = 1;	// 涨跌幅范围内才播报一次
-var ratioLimit_hk = 0;
-
-var content_us = null;
-var content_hk = null;
+var ratioLimit_hk = 1;
 
 var configures_us = [
-	'BABA', // 阿里巴巴（BABA）
-	'BIDU', // 百度（BIDU）
-	'JD', 	// 京东（JD）
-	'AAPL',	// 苹果（AAPL）
-	'GOOGL',// 谷歌A（GOOGL）
-	'FB',	// Facebook（FB）
-	'AMZN',	// 亚马逊(AMZN)
-	'SINA',	// 新浪(SINA)
-	'WB',	// 微博（WB）
-	'TWTR',	// Twitter（TWTR）
-	'TSLA',	// 特斯拉（TSLA）
-	'MOMO',	// 陌陌（MOMO）
-	'NTES',	// 网易（NTES）
-	'PYPL', // PayPal（PYPL）
-	'GM',	// 通用汽车（GM）
-	'VIPS',	// 唯品会（VIPS）
-	'JMEI', // 聚美优品（JMEI）
-	'MSFT', // 微软（MSFT）
-	'NVDA', // 英伟达（NVDA）
+	'BABA', // 阿里巴巴
+	'BIDU', // 百度
+	'JD', 	// 京东
+	'AAPL',	// 苹果
+	'GOOGL',// 谷歌A
+	'FB',	// Facebook
+	'AMZN',	// 亚马逊
+	'SINA',	// 新浪
+	'WB',	// 微博
+	'TWTR',	// Twitter
+	'TSLA',	// 特斯拉
+	'MOMO',	// 陌陌
+	'NTES',	// 网易
+	'PYPL', // PayPal
+	'GM',	// 通用汽车
+	'VIPS',	// 唯品会
+	'JMEI', // 聚美优品
+	'MSFT', // 微软
+	'NVDA', // 英伟达
+	'AMD',  // 美国超微
 	 ];
 
 var configures_hk = [
-	'00700', // 腾讯控股（00700）
+	'00700', // 腾讯控股
+	'01060', // 阿里影业
+	'00241', // 阿里健康
+	'01398', // 工商银行
+	'03328', // 交通银行
+	// '00005', // 汇丰控股
+	// '02888', // 渣打集团
+	// '06030', // 中信证券
+	'01357', // 美图公司
+	'00762', // 中国联通
+	'00728', // 中国电信
+	'02333', // 长城汽车
+	'00175', // 吉利汽车
+	'00699', // 神舟租车
 	 ];
 
 /* GET */
 router.get('/', function(req, res, next) 
 {
-	CRequest = req;
-	CResponse = res;
+	request = req;
+	response = res;
 
 	fetchAll();
 });
@@ -57,8 +69,8 @@ router.get('/', function(req, res, next)
 /* POST */
 router.post('/', function(req, res, next) 
 {
-	CRequest = req;
-	CResponse = res;
+	request = req;
+	response = res;
 
 	fetchAll();
 });
@@ -69,7 +81,7 @@ var maxRetryCount = 1;
 
 function fetchAll()
 {
-	if (CRequest.query.t == 'hk')
+	if (request.query.t == 'hk')
 	{
 		loadStockPrice_hk();
 	}
@@ -95,9 +107,9 @@ function unit(key)
 	}
 }
 
-function isAlibaba(key)
+function isMust(key)
 {
-	return key == 'BABA';
+	return key == 'BABA' || key == '00700';
 }
 
 function keys_us()
@@ -157,7 +169,7 @@ function getStocks(body, local)
 
 		console.log(stock);
 
-		if (isAlibaba(key))
+		if (isMust(key))
 		{
 			stocks.unshift(stock);
 		}
@@ -181,7 +193,7 @@ function loadStockPrice_us()
 		headers: {}
 	};
 
-	request(options, function(error, response, body) {
+	httpRequest(options, function(error, response, body) {
 
 		console.log('us request success!!!');
 		// decode 
@@ -195,7 +207,7 @@ function loadStockPrice_us()
 		{
 			var stock = stocks[index];
 
-			if (Math.abs(stock.ratio) >= ratioLimit_us || isAlibaba(stock.key)) 
+			if (Math.abs(stock.ratio) >= ratioLimit_us || isMust(stock.key)) 
 			{
 				var unit = '美元';
 				var updown = stock.ratio >= 0 ? '涨↑' : '跌↓';
@@ -206,8 +218,7 @@ function loadStockPrice_us()
 			}
 		}
 
-		content_us = content;
-		mergeResults();
+		postRobotMessage(content);
 	});
 };
 
@@ -223,7 +234,7 @@ function loadStockPrice_hk()
 		headers: {}
 	};
 
-	request(options, function(error, response, body) {
+	httpRequest(options, function(error, response, body) {
 
 		console.log('us request success!!!');
 		// decode 
@@ -237,7 +248,7 @@ function loadStockPrice_hk()
 		{
 			var stock = stocks[index];
 
-			if (Math.abs(stock.ratio) >= ratioLimit_hk || isAlibaba(stock.key)) 
+			if (Math.abs(stock.ratio) >= ratioLimit_hk || isMust(stock.key)) 
 			{
 				var unit = '港元';
 				var updown = stock.ratio >= 0 ? '涨↑' : '跌↓';
@@ -248,33 +259,15 @@ function loadStockPrice_hk()
 			}
 		}
 
-		content_hk = content;
-		mergeResults();
+		postRobotMessage(content);
 	});
 };
-
-function mergeResults()
-{
-	// if (content_us != null && content_hk != null)
-	// {
-	// 	postRobotMessage(content_us + content_hk);
-	// };
-
-	if (content_us != null)
-	{
-		postRobotMessage(content_us);
-	}
-	else if (content_hk != null)
-	{
-		postRobotMessage(content_hk);
-	};
-}
 
 function postRobotMessage(content)
 {
 	if (content.length == 0)
 	{
-		CResponse.send('没有股价信息');
+		response.send('没有股价信息');
 		return;
 	}
 
@@ -302,8 +295,8 @@ function postRobotMessage(content)
 		},
 		body:postData
 	};
-	request(postOptions, function(err, httpResponse, body) {
+	httpRequest(postOptions, function(err, httpResponse, body) {
 		console.log('发送股价成功');
 	});
-	CResponse.json(postData);
+	response.json(postData);
 }

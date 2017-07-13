@@ -10,7 +10,7 @@ var mock = require('./http_mock');
 
 // 定时任务，每天早上8点发出
 var job_us = new cronJob('00 00 8 * * *', loadStockPrice_us, null, true);
-var job_hk = new cronJob('00 05 16 * * *', loadStockPrice_hk, null, true);
+var job_hk = new cronJob('05 00 16 * * *', loadStockPrice_hk, null, true);
 
 var request;
 var response = mock.response;

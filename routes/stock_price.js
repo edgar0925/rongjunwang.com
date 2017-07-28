@@ -159,9 +159,11 @@ function getStocks(body, local)
 		// key
 		var key = values[2].split('.')[0];
 
+		var name = values[1].split('（')[0];
+
 		var stock = {
 			'key' : key,
-			'name' : values[1],
+			'name' : name,
 			'close' : parseFloat(values[3]),
 			'ratio' : parseFloat(values[5]),
 			'capital' : parseFloat(values[8]?values[8]:values[9]),
@@ -285,9 +287,9 @@ function postRobotMessage(content)
 
 	var postOptions = {
 		// 钱庄
-		url: 'https://oapi.dingtalk.com/robot/send?access_token=c22f1cbdc4149025f26243e351e786574024a547136ff0eec0b7cb5fb57e066d',
+		// url: 'https://oapi.dingtalk.com/robot/send?access_token=c22f1cbdc4149025f26243e351e786574024a547136ff0eec0b7cb5fb57e066d',
 		// 测试
-		// url: 'https://oapi.dingtalk.com/robot/send?access_token=1ed9af8c0be743a2933c57e0392bcc31484d24cdb26b289b400399b9c4cc6ce8',
+		url: 'https://oapi.dingtalk.com/robot/send?access_token=1ed9af8c0be743a2933c57e0392bcc31484d24cdb26b289b400399b9c4cc6ce8',
 		method: "POST",
 		json:true,
 		headers: {

@@ -7,7 +7,7 @@ var dateUtils = require('date-utils');
 var fs = require('fs');
 
 // 定时任务，每天早上8点发出
-var job = new cronJob('00 00 19 * * *', dosomething, null, true);
+var job = new cronJob('00 00 14 * * *', dosomething, null, true);
 
 var CRequest;	// Current Reqest
 var CResponse;	// Current Response
@@ -23,7 +23,7 @@ var names = [
 	'超丕',	/* 超丕 */
 	'佑界',	/* 佑界 */
 	'绫缨',	/* 绫缨 */
-	'苏翊',	/* 苏翊 */
+	'米玉峰',	/* 苏翊 */
 	'屈道超',	/* 屈道超 */
 	 ];
 
@@ -38,7 +38,7 @@ var mobiles = [
 	'17681800616',	/* 超丕 */
 	'15311115553',	/* 佑界 */
 	'17681808788',	/* 绫缨 */
-	'13615813105',	/* 苏翊 */
+	'13981719866',	/* 米玉峰 */
 	'13989890151',	/* 屈道超 */
 	 ];
 

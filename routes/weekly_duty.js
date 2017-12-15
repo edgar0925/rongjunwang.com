@@ -238,7 +238,7 @@ function saveSequenceOfToday(seq)
 }
 
 /* 发送机器人 */
-var url = 'https://oapi.dingtalk.com/robot/send?access_token=1ed9af8c0be743a2933c57e0392bcc31484d24cdb26b289b400399b9c4cc6ce8';
+var url = 'https://oapi.dingtalk.com/robot/send?access_token=439acc73b1405bd5c05c6ed6f9846802b66ca95143dac9b9afe676e026a04eba';
 function sendRobotMsg(url, msg, func)
 {
 	var testUrl = CRequest ? CRequest.query.test_url : null;

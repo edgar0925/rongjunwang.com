@@ -13,6 +13,7 @@ var stock_price = require('./routes/stock_price');
 var ghelper = require('./routes/ghelper');
 var new_function = require('./routes/new_function');
 var daily_duty = require('./routes/daily_duty');
+var weekly_duty = require('./routes/weekly_duty');
 
 var app = express();
 
@@ -36,6 +37,7 @@ app.use('/stock_price', stock_price);
 app.use('/ghelper', ghelper);
 app.use('/new_function', new_function);
 app.use('/daily_duty', daily_duty);
+app.use('/weekly_duty', weekly_duty);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

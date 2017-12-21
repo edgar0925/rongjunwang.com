@@ -7,7 +7,7 @@ var dateUtils = require('date-utils');
 var fs = require('fs');
 
 // 定时任务，每天早上8点发出
-var job = new cronJob('00 00 15 * * *', dosomething, null, true);
+var job = new cronJob('00 30 10 * * *', dosomething, null, true);
 
 var CRequest;	// Current Reqest
 var CResponse;	// Current Response

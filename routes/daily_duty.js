@@ -12,6 +12,10 @@ var job = new cronJob('00 00 14 * * *', dosomething, null, true);
 var CRequest;	// Current Reqest
 var CResponse;	// Current Response
 
+
+var fileName = 'scrum_daily_duty_sequence';
+
+
 var names = [
 	'子推',	/* 子推 */
 	'昏晓',	/* 昏晓 */
@@ -181,7 +185,6 @@ function isDateValid()
 	return true;
 }
 
-var fileName = 'sequenceOfToday';
 function sequenceOfToday(func)
 {
 	fs.exists(fileName, function(exists){

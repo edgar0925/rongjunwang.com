@@ -7,10 +7,12 @@ var dateUtils = require('date-utils');
 var fs = require('fs');
 
 // 定时任务，每天早上8点发出
-var job = new cronJob('00 30 10 * * *', dosomething, null, true);
+var job = new cronJob('00 10 00 * * *', dosomething, null, true);
 
 var CRequest;	// Current Reqest
 var CResponse;	// Current Response
+
+var fileName = 'ios_weekly_duty_sequence';
 
 var names = [
 	'周佚',	
@@ -197,7 +199,6 @@ function isDateValid()
 	return false;
 }
 
-var fileName = 'sequenceOfToday';
 function sequenceOfToday(func)
 {
 	fs.exists(fileName, function(exists){

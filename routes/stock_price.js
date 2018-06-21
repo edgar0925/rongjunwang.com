@@ -115,7 +115,7 @@ function keys_us()
 	var keys = '';
 	for (var index in configures_us)
 	{
-		keys += 's_us' + configures_us[index] + ',';
+		keys += 'us' + configures_us[index] + ',';
 	}
 	return keys;
 }
@@ -125,7 +125,7 @@ function keys_hk()
 	var keys = '';
 	for (var index in configures_hk)
 	{
-		keys += 's_hk' + configures_hk[index] + ',';
+		keys += 'hk' + configures_hk[index] + ',';
 	}
 	return keys;
 }
@@ -163,8 +163,8 @@ function getStocks(body, local)
 			'key' : key,
 			'name' : name,
 			'close' : parseFloat(values[3]),
-			'ratio' : parseFloat(values[5]),
-			'capital' : parseFloat(values[8]?values[8]:values[9]),
+			'ratio' : parseFloat(values[32]),
+			'capital' : parseFloat(values[45]),
 		};
 
 		console.log(stock);
